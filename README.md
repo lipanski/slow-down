@@ -1,28 +1,37 @@
 # SlowDown
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/slow_down`. To experiment with that code, run `bin/console` for an interactive prompt.
+## Why would you want to slow down your requests?!
 
-TODO: Delete this and the text above, and describe your gem
+Some APIs might be throttling your requests or your own infrastructure is not able to bear the load at peak times. It sometimes pays off to be patient, rather than produce an error page right away.
 
-## Installation
-
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'slow_down'
-```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install slow_down
+**SlowDown** delays a call up until the point where you can afford triggering it. It relies on a Redis lock so it should be able to handle a cluster of servers and it's based on the `PX` and `NX` options of the Redis `SET` command, which should make it thread-safe. Note that these options were introduced with Redis version 2.6.12.
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+require "slow_down"
+
+SlowDown.config do |c|
+  c.requests_per_second = 10
+  c.retries = 50 # times
+  c.timeout = 5 # seconds
+  c.raise_on_timeout = true # will raise SlowDown::Timeout
+  c.redis_url = "redis://localhost:6379/0"
+end
+
+100.times.do
+  SlowDown.run do
+    some_throttled_api_call # accepting only 10 req/sec
+  end
+end
+```
+
+## Inspiration
+
+- [Distributed locks using Redis](https://engineering.gosquared.com/distributed-locks-using-redis)
+- [Redis SET Documentation](http://redis.io/commands/set)
+- [mario-redis-lock](https://github.com/marioizquierdo/mario-redis-lock)
+- [redlock-rb](https://github.com/antirez/redlock-rb)
 
 ## Development
 

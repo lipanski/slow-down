@@ -13,8 +13,8 @@ Gem::Specification.new do |spec|
     spec.metadata['allowed_push_host'] = "TODO: Set to 'http://mygemserver.com' to prevent pushes to rubygems.org, or delete to allow pushes to any server."
   end
 
-  spec.summary       = %q{A centralized Redis lock for multiple resources}
-  spec.description   = %q{Use a lock to slow down requests until your resources can handle the load.}
+  spec.summary       = %q{A centralized Redis lock to help you wait on throttled resources}
+  spec.description   = %q{A centralized Redis lock to help you wait on throttled resources}
   spec.homepage      = "https://github.com/lipanski/slow_down"
   spec.license       = "MIT"
 
