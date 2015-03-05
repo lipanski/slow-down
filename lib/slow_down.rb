@@ -47,11 +47,3 @@ module SlowDown
     raise Timeout if config.raise_on_timeout
   end
 end
-
-SlowDown.config do |c|
-  c.requests_per_second = 2
-  c.retries = 50
-  c.timeout = 2
-  c.raise_on_timeout = false
-  c.redis_url = "redis://localhost:6379/0"
-end

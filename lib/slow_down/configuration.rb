@@ -6,9 +6,9 @@ module SlowDown
     include Singleton
 
     DEFAULTS = {
-      requests_per_second: 10,
+      requests_per_second: 2,
       timeout: 5,
-      retries: 100,
+      retries: 50,
       retry_strategy: :liniar,
       raise_on_timeout: false,
       redis: nil,
