@@ -47,6 +47,7 @@ module SlowDown
 
   def run
     expires_at = Time.now + config.timeout
+    logger.debug("call expires at #{expires_at}ms")
 
     begin
       return yield if free?

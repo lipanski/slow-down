@@ -23,12 +23,12 @@ module SlowDown
     DEFAULTS.each do |key, default_value|
       # Getters
       define_method(key) do
-        user[key] || default_value
+        @user[key] || default_value
       end
 
       # Setters
       define_method("#{key}=") do |value|
-        self.user[key] = value
+        @user[key] = value
         invalidate
       end
     end
@@ -40,7 +40,7 @@ module SlowDown
     end
 
     def redis
-      @redis ||= user[:redis] || Redis.new(url: redis_url || ENV.fetch("REDIS_URL"))
+      @redis ||= @user[:redis] || Redis.new(url: redis_url || ENV.fetch("REDIS_URL"))
     end
 
     def concurrency
@@ -67,7 +67,9 @@ module SlowDown
 
     private
 
-    attr_accessor :user
+    def initialize
+      @user = {}
+    end
 
     def invalidate
       @redis = nil
