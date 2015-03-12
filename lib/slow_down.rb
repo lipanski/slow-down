@@ -40,18 +40,19 @@ module SlowDown
     false
   end
 
-  def postpone
-    logger.debug("sleeping for #{config.seconds_per_retry * 1000}ms")
-    sleep(config.seconds_per_retry)
+  def postpone(retry_count)
+    logger.debug("sleeping for #{config.seconds_per_retry(retry_count) * 1000}ms")
+    sleep(config.seconds_per_retry(retry_count))
   end
 
   def run
-    expires_at = Time.now + config.timeout
+    expires_at, retry_count = Time.now + config.timeout, 0
     logger.debug("call expires at #{expires_at}ms")
 
     begin
       return yield if free?
-      postpone
+      retry_count += 1
+      postpone(retry_count)
     end until Time.now > expires_at
 
     raise Timeout if config.raise_on_timeout
