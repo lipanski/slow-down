@@ -6,7 +6,7 @@ def place_call
 end
 
 describe SlowDown do
-  context "when capped at 2 requests per second and with a timeout of 2 seconds" do
+  context "when capped at 2 requests per second, over two locks and with a timeout of 2 seconds" do
     around do |example|
       SlowDown.config.redis.flushdb
       example.run
@@ -17,6 +17,7 @@ describe SlowDown do
       SlowDown.config do |c|
         c.requests_per_second = 2
         c.timeout = 2
+        c.concurrency = 2
         c.log_level = ENV["DEBUG"] ? Logger::DEBUG : nil
       end
     end
@@ -81,7 +82,7 @@ describe SlowDown do
         end
 
         # This is the :liniar strategy - everyone gets the same chances of acquiring the lock.
-        # Sleeping here ensures that the tested call doesn't stand a chance.
+        # Sleeping here ensures that the tested call doesn't get that chance.
         sleep(0.1)
       end
 

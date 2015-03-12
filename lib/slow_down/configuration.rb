@@ -44,7 +44,7 @@ module SlowDown
     end
 
     def concurrency
-      @concurrency ||= [1, requests_per_second.ceil].max
+      @concurrency ||= @user[:concurrency] || [1, requests_per_second.ceil].max
     end
 
     def locks
