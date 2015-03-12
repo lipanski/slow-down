@@ -1,4 +1,5 @@
 require "singleton"
+require "logger"
 require "redis"
 
 module SlowDown
@@ -8,38 +9,46 @@ module SlowDown
     DEFAULTS = {
       requests_per_second: 2,
       timeout: 5,
-      retries: 50,
+      retries: 10,
       retry_strategy: :liniar,
       raise_on_timeout: false,
       redis: nil,
       redis_url: nil,
       redis_namespace: :slow_down,
-      locks_count: nil
+      concurrency: nil,
+      log_path: STDOUT,
+      log_level: Logger::INFO
     }
 
     DEFAULTS.each do |key, default_value|
       # Getters
       define_method(key) do
-        instance_variable_get("@#{key}") || default_value
+        user[key] || default_value
       end
 
       # Setters
       define_method("#{key}=") do |value|
+        self.user[key] = value
         invalidate
-        instance_variable_set("@#{key}", value.nil? ? default_value : value)
+      end
+    end
+
+    def logger
+      @logger ||= Logger.new(log_path).tap do |l|
+        l.level = log_level
       end
     end
 
     def redis
-      @redis ||= Redis.new(url: redis_url || ENV.fetch("REDIS_URL"))
+      @redis ||= user[:redis] || Redis.new(url: redis_url || ENV.fetch("REDIS_URL"))
     end
 
-    def locks_count
-      @locks_count ||= [1, requests_per_second.ceil].max
+    def concurrency
+      @concurrency ||= [1, requests_per_second.ceil].max
     end
 
     def locks
-      @locks ||= locks_count.times.map do |i|
+      @locks ||= concurrency.times.map do |i|
         [redis_namespace, "lock_#{i}"].compact.join(":")
       end
     end
@@ -49,7 +58,7 @@ module SlowDown
     end
 
     def miliseconds_per_request_per_lock
-      @miliseconds_per_request_per_lock ||= (miliseconds_per_request * locks_count).round
+      @miliseconds_per_request_per_lock ||= (miliseconds_per_request * concurrency).round
     end
 
     def seconds_per_retry
@@ -58,8 +67,13 @@ module SlowDown
 
     private
 
+    attr_accessor :user
+
     def invalidate
-      @locks_count = nil
+      @redis = nil
+      @log_path = nil
+      @log_level = nil
+      @concurrency = nil
       @locks = nil
       @miliseconds_per_request = nil
       @miliseconds_per_request_per_lock = nil

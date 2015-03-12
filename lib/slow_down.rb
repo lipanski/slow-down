@@ -1,3 +1,8 @@
+if [nil, "development", "test"].include?(ENV["RACK_ENV"])
+  require "dotenv"
+  Dotenv.load
+end
+
 require "slow_down/version"
 require "slow_down/configuration"
 
@@ -20,10 +25,14 @@ module SlowDown
     config.redis
   end
 
+  def logger
+    config.logger
+  end
+
   def free?
     locks.each do |key|
       if redis.set(key, 1, px: config.miliseconds_per_request_per_lock, nx: true)
-        puts "#{key} locked for #{config.miliseconds_per_request_per_lock}ms"
+        logger.debug("#{key} locked for #{config.miliseconds_per_request_per_lock}ms")
         return true
       end
     end
@@ -31,8 +40,8 @@ module SlowDown
     false
   end
 
-  def wait
-    puts "sleeping #{config.seconds_per_retry}"
+  def postpone
+    logger.debug("sleeping for #{config.seconds_per_retry * 1000}ms")
     sleep(config.seconds_per_retry)
   end
 
@@ -41,7 +50,7 @@ module SlowDown
 
     begin
       return yield if free?
-      wait
+      postpone
     end until Time.now > expires_at
 
     raise Timeout if config.raise_on_timeout
