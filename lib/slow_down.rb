@@ -57,4 +57,8 @@ module SlowDown
 
     raise Timeout if config.raise_on_timeout
   end
+
+  def reset
+    locks.each { |key| redis.del(key) }
+  end
 end

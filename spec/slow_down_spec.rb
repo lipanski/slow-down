@@ -3,9 +3,9 @@ require "benchmark"
 
 def cleanup
   around do |example|
-    SlowDown.config.redis.flushdb
+    SlowDown.reset
     example.run
-    SlowDown.config.redis.flushdb
+    SlowDown.reset
   end
 end
 
@@ -99,40 +99,5 @@ describe SlowDown do
         expect(Benchmark.realtime { place_call }).to be_within(0.015).of(2.0)
       end
     end
-  end
-
-  context "when using the simple strategy" do
-
-  end
-
-  context "when using the fifo strategy" do
-    cleanup
-
-    before do
-      SlowDown.config do |c|
-        c.requests_per_second = 10
-        c.timeout = 2
-        c.retries = 100
-        c.retry_strategy = :fifo
-        c.log_level = ENV["DEBUG"] ? Logger::DEBUG : nil
-      end
-    end
-
-    it "ensures that the first enqueued requests are served first" do
-      first_batch = 10.times.map { Thread.new { place_call } }
-      sleep(0.1)
-      second_batch = 10.times.map { Thread.new { place_call } }
-      sleep(0.1)
-      third_batch = 10.times.map { Thread.new { place_call } }
-      sleep(0.1)
-
-      expect(first_batch.map(&:value).reject(&:nil?).size).to be_within(2).of(10)
-      expect(second_batch.map(&:value).reject(&:nil?).size).to be_within(2).of(10)
-      expect(third_batch.map(&:value).reject(&:nil?).size).to be_within(2).of(0)
-    end
-  end
-
-  context "when using the lifo strategy" do
-
   end
 end
