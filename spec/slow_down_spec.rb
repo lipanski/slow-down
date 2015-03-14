@@ -14,6 +14,70 @@ def place_call
 end
 
 describe SlowDown do
+  context "with a default configuration" do
+    before do
+      SlowDown.config do |c|
+        c.requests_per_second = 111
+        c.timeout = 111
+        c.retries = 111
+        c.concurrency = 111
+        c.redis_url = "redis://111"
+      end
+    end
+
+    it "" do
+
+    end
+  end
+
+  context "with a request-specific configuration" do
+    before do
+      SlowDown.config do |c|
+        c.requests_per_second = 111
+        c.timeout = 111
+        c.retries = 111
+        c.concurrency = 111
+        c.redis_url = "redis://111"
+      end
+
+      SlowDown.config(:api) do |c|
+        c.requests_per_second = 222
+        c.timeout = 222
+        c.retries = 222
+        c.concurrency = 222
+        c.redis_url = "redis://222"
+      end
+    end
+  end
+
+  context "with a run-specific configuration" do
+    before do
+      SlowDown.config do |c|
+        c.requests_per_second = 111
+        c.timeout = 111
+        c.retries = 111
+        c.concurrency = 111
+        c.redis_url = "redis://111"
+      end
+
+      SlowDown.config(:api) do |c|
+        c.requests_per_second = 222
+        c.timeout = 222
+        c.retries = 222
+        c.concurrency = 222
+        c.redis_url = "redis://222"
+      end
+    end
+
+    let(:run_config) do
+      { requests_per_second: 333, timeout: 333, retries: 333, concurrency: 333, redis_url: "redis://222" }
+    end
+
+    # it "" do
+    #   SlowDown.run(run_config) { 1 }
+    # end
+  end
+
   context "when capped at 2 requests per second, over two locks and with a timeout of 2 seconds" do
     cleanup
 

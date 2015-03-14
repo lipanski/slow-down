@@ -1,4 +1,3 @@
-require "singleton"
 require "logger"
 require "redis"
 require "slow_down/strategy/linear"
@@ -7,16 +6,13 @@ require "slow_down/strategy/inverse_exponential"
 
 module SlowDown
   class Configuration
-    include Singleton
-
     CONCURRENCY_MULTIPLIER = 1
 
     DEFAULTS = {
       requests_per_second: 10,
       timeout: 5,
       retries: 30,
-      retry_strategy: :linear,
-      registered_retry_strategies: [Strategy::Linear, Strategy::Fibonacci, Strategy::InverseExponential],
+      retry_strategy: :default,
       raise_on_timeout: false,
       redis: nil,
       redis_url: nil,
@@ -35,6 +31,11 @@ module SlowDown
         @user[key] = value
         invalidate
       end
+    end
+
+    def initialize(options)
+      @user = {}
+      @options = DEFAULTS.merge(options)
     end
 
     def logger
@@ -67,12 +68,6 @@ module SlowDown
 
     def seconds_per_retry(retry_count)
       seconds_per_retry_arr[retry_count - 1]
-    end
-
-    private
-
-    def initialize
-      @user = {}
     end
 
     def seconds_per_retry_arr

@@ -11,10 +11,16 @@ module SlowDown
 
   Timeout = Class.new(StandardError)
 
-  def config
-    Configuration.instance.tap do |c|
-      yield(c) if block_given?
+  def config(set = :default)
+    @configs ||= {}
+
+    if block_given?
+      @configs[set] = (@configs[set] || Configuration.new).tap do |c|
+        yield(c)
+      end
     end
+
+    @configs[set]
   end
 
   def locks
@@ -45,7 +51,7 @@ module SlowDown
     sleep(config.seconds_per_retry(retry_count))
   end
 
-  def run
+  def run(set = :default)
     expires_at, retry_count = Time.now + config.timeout, 0
     logger.debug("call expires at #{expires_at}ms")
 
