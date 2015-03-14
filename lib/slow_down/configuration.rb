@@ -77,16 +77,23 @@ module SlowDown
 
     def seconds_per_retry_arr
       @seconds_per_retry_arr ||= begin
-        klass = retry_strategy.is_a?(Class) ? retry_strategy : retry_strategy_mapping.fetch(retry_strategy)
-        klass.new(retries, timeout).normalized_series
-      end
-    end
+        klass =
+          case retry_strategy
+          when :linear, :default
+            Strategy::Linear
+          when :fibonacci
+            Strategy::Fibonacci
+          when :inverse_exponential
+            Strategy::InverseExponential
+          else
+            retry_strategy
+          end
 
-    def retry_strategy_mapping
-      @retry_strategy_mapping ||= begin
-        registered_retry_strategies.each_with_object({}) do |el, acc|
-          el.aliases.each { |name| acc[name] = el }
+        unless klass < Strategy::Base
+          fail ":retry_strategy should be a class inheriting SlowDown::Strategy::Base"
         end
+
+        klass.new(retries, timeout).normalized_series
       end
     end
 
@@ -100,7 +107,6 @@ module SlowDown
       @miliseconds_per_request_per_lock = nil
       @seconds_per_retry = nil
       @seconds_per_retry_arr = nil
-      @retry_strategy_mapping = nil
     end
   end
 end

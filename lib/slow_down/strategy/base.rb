@@ -7,10 +7,6 @@ module SlowDown
         @n, @max = n, max
       end
 
-      def self.aliases
-        fail NotImplemented
-      end
-
       def series
         fail NotImplemented
       end
