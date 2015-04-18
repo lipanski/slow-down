@@ -19,6 +19,14 @@ module SlowDown
       all[name] || create(name, options)
     end
 
+    def self.remove(group_name)
+      @groups.delete(group_name)
+    end
+
+    def self.remove_all
+      @groups = {}
+    end
+
     attr_reader :name, :config
 
     def initialize(name, options = {})

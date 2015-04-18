@@ -28,6 +28,7 @@ module SlowDown
   end
 
   def reset(group_name = :default)
-    Group.find(group_name).reset
+    group = Group.find(group_name)
+    group.reset if group
   end
 end
