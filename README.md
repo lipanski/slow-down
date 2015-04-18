@@ -1,5 +1,7 @@
 # SlowDown
 
+[![Build Status](https://travis-ci.org/lipanski/slow-down.svg?branch=master)](https://travis-ci.org/lipanski/slow-down)
+
 ## Why would you want to slow down your requests?!
 
 Some APIs might be throttling your requests or your own infrastructure is not able to bear the load at peak times. It sometimes pays off to be patient, rather than produce an error page right away.
@@ -35,9 +37,9 @@ end
 
 ## TODO
 
--[ ] simple lock
--[ ] FIFO strategy
--[ ] LIFO strategy  
+- [ ] simple lock
+- [ ] FIFO strategy
+- [ ] LIFO strategy
 
 ## Development
 
