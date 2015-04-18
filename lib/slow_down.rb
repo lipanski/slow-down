@@ -4,67 +4,30 @@ if [nil, "development", "test"].include?(ENV["RACK_ENV"])
 end
 
 require "slow_down/version"
-require "slow_down/configuration"
+require "slow_down/group"
 
 module SlowDown
   module_function
 
   Timeout = Class.new(StandardError)
 
-  def config(set = :default)
-    @configs ||= {}
+  def config(group_name = :default)
+    group = Group.find_or_create(group_name)
 
-    if block_given?
-      @configs[set] = (@configs[set] || Configuration.new).tap do |c|
-        yield(c)
-      end
+    group.config.tap do |c|
+      yield(c) if block_given?
     end
-
-    @configs[set]
   end
 
-  def locks
-    config.locks
+  def groups
+    Group.all
   end
 
-  def redis
-    config.redis
+  def run(group_name = :default, options = {}, &block)
+    Group.find_or_create(group_name, options).run(&block)
   end
 
-  def logger
-    config.logger
-  end
-
-  def free?
-    locks.each do |key|
-      if redis.set(key, 1, px: config.miliseconds_per_request_per_lock, nx: true)
-        logger.debug("#{key} locked for #{config.miliseconds_per_request_per_lock}ms")
-        return true
-      end
-    end
-
-    false
-  end
-
-  def postpone(retry_count)
-    logger.debug("sleeping for #{config.seconds_per_retry(retry_count) * 1000}ms")
-    sleep(config.seconds_per_retry(retry_count))
-  end
-
-  def run(set = :default)
-    expires_at, retry_count = Time.now + config.timeout, 0
-    logger.debug("call expires at #{expires_at}ms")
-
-    begin
-      return yield if free?
-      retry_count += 1
-      postpone(retry_count)
-    end until Time.now > expires_at
-
-    raise Timeout if config.raise_on_timeout
-  end
-
-  def reset
-    locks.each { |key| redis.del(key) }
+  def reset(group_name = :default)
+    Group.find(group_name).reset
   end
 end

@@ -17,6 +17,7 @@ module SlowDown
       redis: nil,
       redis_url: nil,
       redis_namespace: :slow_down,
+      lock_namespace: :default,
       concurrency: nil,
       log_path: STDOUT,
       log_level: Logger::INFO
@@ -24,17 +25,16 @@ module SlowDown
 
     DEFAULTS.each do |key, default_value|
       define_method(key) do
-        @user[key] || default_value
+        @options[key] || default_value
       end
 
       define_method("#{key}=") do |value|
-        @user[key] = value
+        @options[key] = value
         invalidate
       end
     end
 
     def initialize(options)
-      @user = {}
       @options = DEFAULTS.merge(options)
     end
 
@@ -45,16 +45,16 @@ module SlowDown
     end
 
     def redis
-      @redis ||= @user[:redis] || Redis.new(url: redis_url || ENV.fetch("REDIS_URL"))
+      @redis ||= @options[:redis] || Redis.new(url: redis_url || ENV.fetch("REDIS_URL"))
     end
 
     def concurrency
-      @concurrency ||= @user[:concurrency] || [1, requests_per_second.ceil * CONCURRENCY_MULTIPLIER].max
+      @concurrency ||= @options[:concurrency] || [1, requests_per_second.ceil * CONCURRENCY_MULTIPLIER].max
     end
 
     def locks
       @locks ||= concurrency.times.map do |i|
-        [redis_namespace, "lock_#{i}"].compact.join(":")
+        [redis_namespace, "#{lock_namespace}_#{i}"].compact.join(":")
       end
     end
 
