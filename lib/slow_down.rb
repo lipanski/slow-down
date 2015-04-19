@@ -10,6 +10,7 @@ module SlowDown
   module_function
 
   Timeout = Class.new(StandardError)
+  ConfigError = Class.new(StandardError)
 
   def config(group_name = :default)
     group = Group.find_or_create(group_name)
@@ -23,7 +24,13 @@ module SlowDown
     Group.all
   end
 
-  def run(group_name = :default, options = {}, &block)
+  def run(first = :default, second = {}, &block)
+    if first.is_a?(Hash) && second.empty?
+      group_name, options = :default, first
+    else
+      group_name, options = first, second
+    end
+
     Group.find_or_create(group_name, options).run(&block)
   end
 

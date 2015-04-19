@@ -16,6 +16,10 @@ module SlowDown
     end
 
     def self.find_or_create(name, options = {})
+      if all[name] && !options.empty?
+        fail ConfigError, "Group #{name} has already been configured elsewhere - you may not override configurations."
+      end
+
       all[name] || create(name, options)
     end
 
