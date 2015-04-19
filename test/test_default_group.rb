@@ -1,7 +1,4 @@
-require "minitest/autorun"
-require "benchmark"
-
-class TestSlowDown < MiniTest::Test
+class TestDefaultGroup < MiniTest::Test
   def setup
     @counter = 0
   end
@@ -68,33 +65,5 @@ class TestSlowDown < MiniTest::Test
     assert_raises(SlowDown::Timeout) { SlowDown.run { @counter += 1 } }
 
     assert_equal(1, @counter)
-  end
-
-  def test_grouped_straight_runs
-    skip
-  end
-
-  def test_grouped_throttled_runs
-    skip
-  end
-
-  def test_grouped_throttled_runs_with_timeout
-    skip
-  end
-
-  def test_grouped_throttled_runs_with_raised_timeout
-    skip
-  end
-
-  def test_threaded_straight_runs
-    skip
-  end
-
-  def test_threaded_throttled_runs
-    skip
-  end
-
-  def test_threadded_throttled_runs_with_timeout
-    skip
   end
 end
