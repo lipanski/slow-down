@@ -1,6 +1,9 @@
 require_relative "test_helper"
+require_relative "support/tolerance"
 
 class TestDefaultGroup < MiniTest::Test
+  include Support::Tolerance
+
   def setup
     @counter = 0
   end
@@ -12,7 +15,7 @@ class TestDefaultGroup < MiniTest::Test
   def test_single_straight_run
     elapsed_time = Benchmark.realtime { SlowDown.run { @counter += 1 } }
 
-    assert_in_delta(0.02, elapsed_time, 0.02)
+    assert_in_delta(0.0, elapsed_time, TOLERANCE)
     assert_equal(1, @counter)
   end
 
@@ -25,7 +28,7 @@ class TestDefaultGroup < MiniTest::Test
       5.times { SlowDown.run { @counter += 1 } }
     end
 
-    assert_in_delta(0.02, elapsed_time, 0.02)
+    assert_in_delta(0.0, elapsed_time, TOLERANCE)
     assert_equal(5, @counter)
   end
 
@@ -40,7 +43,7 @@ class TestDefaultGroup < MiniTest::Test
     end
 
     assert_equal(3, @counter)
-    assert_in_delta(1.0, elapsed_time, 0.05)
+    assert_in_delta(1.0, elapsed_time, TOLERANCE)
   end
 
   def test_multiple_throttled_runs_with_timeout
@@ -50,9 +53,11 @@ class TestDefaultGroup < MiniTest::Test
     end
 
     SlowDown.run { @counter += 1 }
-    elapsed_time = Benchmark.realtime { SlowDown.run { @counter += 1 } }
+    elapsed_time = Benchmark.realtime do
+      SlowDown.run { @counter += 1 }
+    end
 
-    assert_in_delta(0.5, elapsed_time, 0.05)
+    assert_in_delta(0.5, elapsed_time, TOLERANCE)
     assert_equal(1, @counter)
   end
 
@@ -64,7 +69,10 @@ class TestDefaultGroup < MiniTest::Test
     end
 
     SlowDown.run { @counter += 1 }
-    assert_raises(SlowDown::Timeout) { SlowDown.run { @counter += 1 } }
+
+    assert_raises(SlowDown::Timeout) do
+      SlowDown.run { @counter += 1 }
+    end
 
     assert_equal(1, @counter)
   end
