@@ -13,7 +13,9 @@ class TestDefaultGroup < MiniTest::Test
   end
 
   def test_single_straight_run
-    elapsed_time = Benchmark.realtime { SlowDown.run { @counter += 1 } }
+    elapsed_time = Benchmark.realtime do
+      SlowDown.run { @counter += 1 }
+    end
 
     assert_in_delta(0.0, elapsed_time, TOLERANCE)
     assert_equal(1, @counter)
@@ -25,7 +27,9 @@ class TestDefaultGroup < MiniTest::Test
     end
 
     elapsed_time = Benchmark.realtime do
-      5.times { SlowDown.run { @counter += 1 } }
+      5.times do
+        SlowDown.run { @counter += 1 }
+      end
     end
 
     assert_in_delta(0.0, elapsed_time, TOLERANCE)
@@ -39,7 +43,9 @@ class TestDefaultGroup < MiniTest::Test
     end
 
     elapsed_time = Benchmark.realtime do
-      3.times { SlowDown.run { @counter += 1 } }
+      3.times do
+        SlowDown.run { @counter += 1 }
+      end
     end
 
     assert_equal(3, @counter)
@@ -53,6 +59,7 @@ class TestDefaultGroup < MiniTest::Test
     end
 
     SlowDown.run { @counter += 1 }
+
     elapsed_time = Benchmark.realtime do
       SlowDown.run { @counter += 1 }
     end
