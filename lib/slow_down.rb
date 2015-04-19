@@ -1,4 +1,4 @@
-if [nil, "development", "test"].include?(ENV["RACK_ENV"])
+if ["development", "test"].include?(ENV["RACK_ENV"])
   require "dotenv"
   Dotenv.load
 end
@@ -28,7 +28,8 @@ module SlowDown
   end
 
   def reset(group_name = :default)
-    group = Group.find(group_name)
-    group.reset if group
+    if group = Group.find(group_name)
+      group.reset
+    end
   end
 end

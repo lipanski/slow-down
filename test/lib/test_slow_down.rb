@@ -7,14 +7,11 @@ class TestSlowDown < MiniTest::Test
   end
 
   def teardown
-    SlowDown.reset
     SlowDown::Group.remove_all
   end
 
   def test_single_straight_run
-    elapsed_time = Benchmark.realtime do
-      SlowDown.run { @counter += 1 }
-    end
+    elapsed_time = Benchmark.realtime { SlowDown.run { @counter += 1 } }
 
     assert_in_delta(0.02, elapsed_time, 0.02)
     assert_equal(1, @counter)

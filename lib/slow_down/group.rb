@@ -20,11 +20,14 @@ module SlowDown
     end
 
     def self.remove(group_name)
+      return unless group = Group.find(group_name)
+
+      group.reset
       @groups.delete(group_name)
     end
 
     def self.remove_all
-      @groups = {}
+      all.each_value(&:remove)
     end
 
     attr_reader :name, :config
@@ -48,6 +51,10 @@ module SlowDown
 
     def reset
       config.locks.each { |key| config.redis.del(key) }
+    end
+
+    def remove
+      Group.remove(@name)
     end
 
     private
