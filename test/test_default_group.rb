@@ -1,3 +1,5 @@
+require_relative "test_helper"
+
 class TestDefaultGroup < MiniTest::Test
   def setup
     @counter = 0

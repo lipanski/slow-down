@@ -1,3 +1,5 @@
+require_relative "test_helper"
+
 class TestThreadedRuns < MiniTest::Test
   def setup
     @counter = 0
