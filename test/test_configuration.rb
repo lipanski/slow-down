@@ -133,4 +133,56 @@ class TestConfigurations < MiniTest::Test
   def test_logger
     skip "todo"
   end
+
+  def test_miliseconds_per_request
+    SlowDown.config { |c| c.requests_per_second = 42 }
+
+    assert_equal(1000.0 / 42, SlowDown.config.miliseconds_per_request)
+  end
+
+  def test_miliseconds_per_request_per_lock
+    SlowDown.config { |c| c.requests_per_second = 42; c.concurrency = 3 }
+
+    assert_equal(((1000.0 / 42) * 3).round, SlowDown.config.miliseconds_per_request_per_lock)
+  end
+
+  def test_seconds_per_retry_arr_from_known_symbol
+    SlowDown.config { |c| c.retry_strategy = :fibonacci; c.retries = 7 }
+
+    assert_instance_of(Array, SlowDown.config.seconds_per_retry_arr)
+    assert_equal(7, SlowDown.config.seconds_per_retry_arr.size)
+  end
+
+  def test_seconds_per_retry_arr_from_unknown_symbol
+    SlowDown.config { |c| c.retry_strategy = :cocojumbo }
+
+    assert_raises(SlowDown::ConfigError) do
+      SlowDown.config.seconds_per_retry_arr
+    end
+  end
+
+  def test_seconds_per_retry_arr_from_custom_class
+    strategy = Class.new(SlowDown::Strategy::Base) do
+      def series
+        n.times.map { |i| i + Math::PI }
+      end
+    end
+
+    SlowDown.config { |c| c.retry_strategy = strategy; c.retries = 7 }
+
+    assert_instance_of(Array, SlowDown.config.seconds_per_retry_arr)
+    assert_equal(7, SlowDown.config.seconds_per_retry_arr.size)
+  end
+
+  def test_seconds_per_retry_arr_from_class_not_extending_strategy_base
+    SlowDown.config { |c| c.retry_strategy = Class.new }
+
+    assert_raises(SlowDown::ConfigError) do
+      SlowDown.config.seconds_per_retry_arr
+    end
+  end
+
+  def test_seconds_per_retry
+    skip "todo"
+  end
 end

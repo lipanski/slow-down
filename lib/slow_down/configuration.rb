@@ -84,8 +84,8 @@ module SlowDown
             retry_strategy
           end
 
-        unless klass < Strategy::Base
-          fail ":retry_strategy should be a class inheriting SlowDown::Strategy::Base"
+        unless klass.is_a?(Class) && klass < Strategy::Base
+          fail ConfigError, ":retry_strategy should be a class inheriting SlowDown::Strategy::Base"
         end
 
         klass.new(retries, timeout).normalized_series
