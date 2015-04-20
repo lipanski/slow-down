@@ -14,7 +14,7 @@ class TestConfigurations < MiniTest::Test
   end
 
   def test_redis_from_env_variable
-    skip "TODO: minitest mocking Y U NO work"
+    skip "todo: minitest mocking..."
 
     Object.stub_const(:ENV, { "REDIS_URL" => "redis://hello" }) do
       mock = MiniTest::Mock.new
@@ -39,7 +39,7 @@ class TestConfigurations < MiniTest::Test
   end
 
   def test_redis_from_url
-    skip "TODO: minitest mocking Y U NO work"
+    skip "todo: minitest mocking..."
 
     config = SlowDown.config do |c|
       c.redis_url = "redis://hello"
@@ -80,5 +80,57 @@ class TestConfigurations < MiniTest::Test
     SlowDown.run(retries: 999) {}
 
     assert_equal(999, SlowDown.config.retries)
+  end
+
+  def test_concurrency_from_config
+    SlowDown.config { |c| c.concurrency = 999 }
+
+    assert_equal(999, SlowDown.config.concurrency)
+  end
+
+  def test_concurrency_from_run
+    SlowDown.run(concurrency: 999) {}
+
+    assert_equal(999, SlowDown.config.concurrency)
+  end
+
+  def test_concurrency_from_default_if_requests_per_second_below_1
+    SlowDown.config { |c| c.requests_per_second = 0.5 }
+
+    assert_equal(1, SlowDown.config.concurrency)
+  end
+
+  def test_concurrency_from_default_if_requests_per_second_above_1
+    SlowDown.config { |c| c.requests_per_second = 999 }
+
+    assert_equal(999, SlowDown.config.concurrency)
+  end
+
+  def test_locks
+    SlowDown.config { |c| c.redis_namespace = :hello; c.lock_namespace = :world; c.concurrency = 3 }
+
+    assert_equal(["hello:world_0", "hello:world_1", "hello:world_2"], SlowDown.config.locks)
+  end
+
+  def test_locks_from_default_and_group_name
+    SlowDown.config(:hello) { |c| c.concurrency = 3 }
+
+    assert_equal(["slow_down:hello_0", "slow_down:hello_1", "slow_down:hello_2"], SlowDown.config(:hello).locks)
+  end
+
+  def test_raise_on_timeout_from_config
+    SlowDown.config { |c| c.raise_on_timeout = true }
+
+    assert_equal(true, SlowDown.config.raise_on_timeout)
+  end
+
+  def test_raise_on_timeout_from_run
+    SlowDown.run(raise_on_timeout: true) {}
+
+    assert_equal(true, SlowDown.config.raise_on_timeout)
+  end
+
+  def test_logger
+    skip "todo"
   end
 end
