@@ -22,9 +22,7 @@ class TestDefaultGroup < MiniTest::Test
   end
 
   def test_multiple_straight_runs
-    SlowDown.config do |c|
-      c.requests_per_second = 5
-    end
+    SlowDown.config { |c| c.requests_per_second = 5 }
 
     elapsed_time = Benchmark.realtime do
       5.times do
@@ -82,5 +80,56 @@ class TestDefaultGroup < MiniTest::Test
     end
 
     assert_equal(1, @counter)
+  end
+
+  def test_truthy_free_check
+    SlowDown.config { |c| c.requests_per_second = 5 }
+
+    4.times do
+      SlowDown.run { 1 }
+    end
+
+    assert_equal(true, SlowDown.free?)
+  end
+
+  def test_falsy_free_check
+    SlowDown.config { |c| c.requests_per_second = 5 }
+
+    5.times do
+      SlowDown.run { 1 }
+    end
+
+    assert_equal(false, SlowDown.free?)
+  end
+
+  def test_free_check_is_non_blocking
+    SlowDown.config { |c| c.requests_per_second = 3 }
+
+    3.times do
+      SlowDown.run { 1 }
+    end
+
+    results = []
+
+    elapsed_time = Benchmark.realtime do
+      50.times do
+        results << SlowDown.free?
+      end
+    end
+
+    assert_in_delta(0.0, elapsed_time, TOLERANCE)
+    assert_equal(50, results.select { |r| r == false }.size)
+  end
+
+  def test_free_check_consumes_the_resource
+    SlowDown.config { |c| c.requests_per_second =  3 }
+
+    2.times do
+      SlowDown.run { 1 }
+    end
+
+    SlowDown.free?
+
+    assert_equal(false, SlowDown.free?)
   end
 end

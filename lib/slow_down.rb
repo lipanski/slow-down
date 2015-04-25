@@ -24,19 +24,27 @@ module SlowDown
     Group.all
   end
 
-  def run(first = :default, second = {}, &block)
-    if first.is_a?(Hash) && second.empty?
-      group_name, options = :default, first
-    else
-      group_name, options = first, second
-    end
+  def run(*args, &block)
+    find_or_create_group(*args).run(&block)
+  end
 
-    Group.find_or_create(group_name, options).run(&block)
+  def free?(*args)
+    find_or_create_group(*args).free?
   end
 
   def reset(group_name = :default)
     if group = Group.find(group_name)
       group.reset
     end
+  end
+
+  def find_or_create_group(*args)
+    if args[0].is_a?(Hash)
+      group_name, options = :default, args[0]
+    else
+      group_name, options = args[0] || :default, args[1] || {}
+    end
+
+    Group.find_or_create(group_name, options)
   end
 end

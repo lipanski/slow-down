@@ -53,16 +53,6 @@ module SlowDown
       raise Timeout if config.raise_on_timeout
     end
 
-    def reset
-      config.locks.each { |key| config.redis.del(key) }
-    end
-
-    def remove
-      Group.remove(@name)
-    end
-
-    private
-
     def free?
       config.locks.each do |key|
         if config.redis.set(key, 1, px: config.miliseconds_per_request_per_lock, nx: true)
@@ -73,6 +63,16 @@ module SlowDown
 
       false
     end
+
+    def reset
+      config.locks.each { |key| config.redis.del(key) }
+    end
+
+    def remove
+      Group.remove(@name)
+    end
+
+    private
 
     def wait(iteration)
       config.logger.debug("sleeping for #{config.seconds_per_retry(iteration) * 1000}ms")

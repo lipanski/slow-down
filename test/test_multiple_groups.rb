@@ -108,4 +108,52 @@ class TestMultipleGroups < MiniTest::Test
     assert_equal(1, a_counter)
     assert_equal(8, b_counter)
   end
+
+  def test_grouped_truthy_free_checks
+    SlowDown.config(:a) { |c| c.requests_per_second = 3 }
+    SlowDown.config(:b) { |c| c.requests_per_second = 5 }
+
+    2.times do
+      SlowDown.run(:a) { 1 }
+    end
+
+    4.times do
+      SlowDown.run(:b) { 1 }
+    end
+
+    assert_equal(true, SlowDown.free?(:a))
+    assert_equal(true, SlowDown.free?(:b))
+  end
+
+  def test_grouped_falsy_free_checks
+    SlowDown.config(:a) { |c| c.requests_per_second = 3 }
+    SlowDown.config(:b) { |c| c.requests_per_second = 5 }
+
+    3.times do
+      SlowDown.run(:a) { 1 }
+    end
+
+    5.times do
+      SlowDown.run(:b) { 1 }
+    end
+
+    assert_equal(false, SlowDown.free?(:a))
+    assert_equal(false, SlowDown.free?(:b))
+  end
+
+  def test_grouped_mixed_free_checks
+    SlowDown.config(:a) { |c| c.requests_per_second = 3 }
+    SlowDown.config(:b) { |c| c.requests_per_second = 5 }
+
+    3.times do
+      SlowDown.run(:a) { 1 }
+    end
+
+    3.times do
+      SlowDown.run(:b) { 1 }
+    end
+
+    assert_equal(false, SlowDown.free?(:a))
+    assert_equal(true, SlowDown.free?(:b))
+  end
 end
