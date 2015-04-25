@@ -1,5 +1,5 @@
 module Support
   module Tolerance
-    TOLERANCE = (RUBY_PLATFORM == "java") ? 0.1 : 0.05
+    TOLERANCE = 0.06
   end
 end
