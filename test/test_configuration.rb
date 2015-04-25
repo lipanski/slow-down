@@ -183,6 +183,12 @@ class TestConfigurations < MiniTest::Test
   end
 
   def test_seconds_per_retry
-    skip "todo"
+    SlowDown.config { |c| c.retry_strategy = :linear; c.retries = 10 }
+
+    10.times.each do |i|
+      assert_equal(0.5, SlowDown.config.seconds_per_retry(i + 1))
+    end
+
+    assert_equal(nil, SlowDown.config.seconds_per_retry(11))
   end
 end
