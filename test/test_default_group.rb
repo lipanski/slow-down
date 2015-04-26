@@ -112,13 +112,13 @@ class TestDefaultGroup < MiniTest::Test
     results = []
 
     elapsed_time = Benchmark.realtime do
-      50.times do
+      20.times do
         results << SlowDown.free?
       end
     end
 
     assert_in_delta(0.0, elapsed_time, TOLERANCE)
-    assert_equal(50, results.select { |r| r == false }.size)
+    assert_equal(20, results.select { |r| r == false }.size)
   end
 
   def test_free_check_consumes_the_resource
