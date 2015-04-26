@@ -4,8 +4,8 @@
 
 ## Why would you want to slow down your requests?!
 
-Some external APIs might be throttling your requests and web scraping attempts or your own infrastructure is not able to bear the load.
-It sometimes pays off to be patient.
+Some external APIs might be throttling your requests (or web scraping attempts) or your own infrastructure is not able to bear the load.
+It sometimes pays off to be patient...
 
 **SlowDown** delays a call up until the point where you can afford triggering it.
 It relies on a Redis lock so it should be able to handle a cluster of servers all going for the same resource.
@@ -32,50 +32,6 @@ SlowDown.run do
 end
 ```
 
-### Default configuration
-
-```ruby
-SlowDown.config do |c|
-  # The allowed number of calls per second.
-  c.requests_per_second = 10
-
-  # The number of seconds during which SlowDown will try and acquire the resource for a given call.
-  c.timeout = 5
-
-  # Whether to raise an error when the timeout was reached and the resource could not be acquired.
-  # Raises SlowDown::Timeout.
-  c.raise_on_timeout = false
-
-  # How many retries should be performed til the timeout is reached.
-  c.retries = 30
-
-  # The algorithm used to schedule the amount of time to wait between retries.
-  # Available strategies: :linear, :inverse_exponential, :fibonacci or a class extending SlowDown::Strategy::Base.
-  c.retry_strategy = :linear
-
-  # Redis can be configured either directly, by setting a Redis instance to this variable
-  # or via the REDIS_URL environment variable or via the redis_url configuration.
-  c.redis = nil
-
-  # Configure Redis via the instances' URL.
-  c.redis_url = nil
-
-  # The Redis namespace to apply to all locks.
-  c.redis_namespace = :slow_down
-
-  # The namespace to apply to the default group.
-  # Individual groups will overwrite this with the group name.
-  c.lock_namespace = :default
-
-  # Set this to a path or file descriptor in order to log to file.
-  c.log_path = STDOUT
-
-  # By default, the SlowDown logger is disabled.
-  # Set this to Logger::DEBUG, Logger::INFO or Logger::ERROR for logging various runtime information.
-  c.log_level = Logger::UNKNOWN
-end
-```
-
 ### Groups
 
 **SlowDown** can be configured for individual groups, which can be run in isolation:
@@ -98,10 +54,12 @@ SlowDown.run(:github) { ... }
 SlowDown.run(:twitter) { ... }
 ```
 
-### Configuration
+### Retrieve configuration
 
-When called without a block, `SlowDown.config` will return a `SlowDown::Configuration` object corresponding to the `:default` configuration.
-In order to fetch the configuration of a different group `:my_group`, use `SlowDown.config(:my_group)`.
+When called without a block, `SlowDown.config` will return the configuration of the *default* group.
+In order to fetch the configuration of a different group use `SlowDown.config(:group_name)`.
+
+### Inline configuration
 
 **SlowDown** may also be configured directly within the `SlowDown.run` call:
 
@@ -114,6 +72,55 @@ end
 # Configure a different group and run a call within that group
 SlowDown.run(:my_group, requests_per_second: 2, timeout: 1) do
   # ...
+end
+```
+
+### Defaults & Available options
+
+```ruby
+SlowDown.config do |c|
+  # The allowed number of calls per second.
+  c.requests_per_second = 10
+
+  # The number of seconds during which SlowDown will try and acquire the resource
+  # for a given call.
+  c.timeout = 5
+
+  # Whether to raise an error when the timeout was reached and the resource could
+  # not be acquired.
+  # Raises SlowDown::Timeout.
+  c.raise_on_timeout = false
+
+  # How many retries should be performed til the timeout is reached.
+  c.retries = 30
+
+  # The algorithm used to schedule the amount of time to wait between retries.
+  # Available strategies: :linear, :inverse_exponential, :fibonacci or a class
+  # extending SlowDown::Strategy::Base.
+  c.retry_strategy = :linear
+
+  # Redis can be configured either directly, by setting a Redis instance to this
+  # variable or via the REDIS_URL environment variable or via the redis_url
+  # configuration.
+  c.redis = nil
+
+  # Configure Redis via the instances' URL.
+  c.redis_url = nil
+
+  # The Redis namespace to apply to all locks.
+  c.redis_namespace = :slow_down
+
+  # The namespace to apply to the default group.
+  # Individual groups will overwrite this with the group name.
+  c.lock_namespace = :default
+
+  # Set this to a path or file descriptor in order to log to file.
+  c.log_path = STDOUT
+
+  # By default, the SlowDown logger is disabled.
+  # Set this to Logger::DEBUG, Logger::INFO or Logger::ERROR for logging various
+  # runtime information.
+  c.log_level = Logger::UNKNOWN
 end
 ```
 
@@ -152,6 +159,14 @@ def register_user(name, address, phone)
 
   user.save
 end
+```
+
+### Resetting the locks
+
+If you ever need to reset the locks, you can do that for any group by calling:
+
+```ruby
+SlowDown.reset(:group_name)
 ```
 
 ## Polling Strategies
