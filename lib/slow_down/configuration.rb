@@ -20,7 +20,7 @@ module SlowDown
       lock_namespace: :default,
       concurrency: nil,
       log_path: STDOUT,
-      log_level: Logger::INFO
+      log_level: Logger::UNKNOWN
     }
 
     DEFAULTS.each do |key, default_value|
@@ -41,6 +41,9 @@ module SlowDown
     def logger
       @logger ||= Logger.new(log_path).tap do |l|
         l.level = log_level
+        l.formatter = proc do |severity, time, group_name, message|
+          "[#{time}] [#{severity}] [##{Process.pid}] [#{group_name}] #{message}\n"
+        end
       end
     end
 

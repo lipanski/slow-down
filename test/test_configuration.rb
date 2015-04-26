@@ -130,8 +130,62 @@ class TestConfigurations < MiniTest::Test
     assert_equal(true, SlowDown.config.raise_on_timeout)
   end
 
-  def test_logger
-    skip "todo"
+  def test_log_level
+    SlowDown.config { |c| c.log_level = Logger::DEBUG }
+
+    assert_equal(Logger::DEBUG, SlowDown.config.logger.level)
+  end
+
+  def test_log_path
+    Tempfile.create("test-logger.log") do |file|
+      SlowDown.config { |c| c.log_path = file }
+
+      assert_equal(file, SlowDown.config.logger.instance_variable_get(:@logdev).dev)
+    end
+  end
+
+  def test_silent_logger_by_default
+    assert_silent do
+      SlowDown.config do |c|
+        c.log_path = $stdout
+        c.raise_on_timeout = true
+        c.timeout = 0.5
+        c.requests_per_second = 2
+      end
+
+      3.times do
+        SlowDown.run { 1 } rescue SlowDown::Timeout
+      end
+    end
+  end
+
+  def test_error_logger
+    assert_output(/^\[.*\] \[ERROR\] \[.*\] \[default\] Timeout error raised$/) do
+      SlowDown.config do |c|
+        c.log_path = $stdout
+        c.log_level = Logger::ERROR
+        c.raise_on_timeout = true
+        c.timeout = 0.5
+        c.requests_per_second = 2
+      end
+
+      3.times do
+        SlowDown.run { 1 } rescue SlowDown::Timeout
+      end
+    end
+  end
+
+  def test_info_logger
+    assert_output(/^\[.*\] \[INFO\] \[.*\] \[default\] Lock (.+) was acquired for (\d+)ms$/) do
+      SlowDown.config do |c|
+        c.log_path = $stdout
+        c.log_level = Logger::INFO
+        c.requests_per_second = 2
+        c.timeout = 0.5
+      end
+
+      SlowDown.run { 1 }
+    end
   end
 
   def test_miliseconds_per_request

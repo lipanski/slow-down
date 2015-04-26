@@ -1,5 +1,5 @@
 module Support
   module Tolerance
-    TOLERANCE = 0.06
+    TOLERANCE = 0.065
   end
 end

@@ -17,6 +17,7 @@ module SlowDown
 
     def self.find_or_create(name, options = {})
       if all[name] && !options.empty?
+        all[name].config.logger.error(name) { "Group #{name} has already been configured elsewhere" }
         fail ConfigError, "Group #{name} has already been configured elsewhere - you may not override configurations"
       end
 
@@ -43,20 +44,24 @@ module SlowDown
 
     def run
       expires_at, iteration = Time.now + config.timeout, 0
-      config.logger.debug("call expires at #{expires_at}ms")
+      config.logger.debug(name) { "Run attempt initiatied, times out at #{expires_at}" }
 
       begin
         return yield if free?
         wait(iteration += 1)
       end until Time.now > expires_at
 
-      raise Timeout if config.raise_on_timeout
+      config.logger.debug(name) { "Run attempt timed out" }
+      if config.raise_on_timeout
+        config.logger.error(name) { "Timeout error raised" }
+        raise Timeout
+      end
     end
 
     def free?
       config.locks.each do |key|
         if config.redis.set(key, 1, px: config.miliseconds_per_request_per_lock, nx: true)
-          config.logger.debug("#{key} locked for #{config.miliseconds_per_request_per_lock}ms")
+          config.logger.info(name) { "Lock #{key} was acquired for #{config.miliseconds_per_request_per_lock}ms" }
           return true
         end
       end
@@ -75,7 +80,7 @@ module SlowDown
     private
 
     def wait(iteration)
-      config.logger.debug("sleeping for #{config.seconds_per_retry(iteration) * 1000}ms")
+      config.logger.debug(name) { "Sleeping for #{config.seconds_per_retry(iteration) * 1000}ms" }
       sleep(config.seconds_per_retry(iteration))
     end
   end
