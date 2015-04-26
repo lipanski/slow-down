@@ -11,9 +11,9 @@ module SlowDown
     DEFAULTS = {
       requests_per_second: 10,
       timeout: 5,
-      retries: 30,
-      retry_strategy: :default,
       raise_on_timeout: false,
+      retries: 30,
+      retry_strategy: :linear,
       redis: nil,
       redis_url: nil,
       redis_namespace: :slow_down,
@@ -77,7 +77,7 @@ module SlowDown
       @seconds_per_retry_arr ||= begin
         klass =
           case retry_strategy
-          when :linear, :default
+          when :linear
             Strategy::Linear
           when :fibonacci
             Strategy::Fibonacci
