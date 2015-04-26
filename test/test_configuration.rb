@@ -137,11 +137,12 @@ class TestConfigurations < MiniTest::Test
   end
 
   def test_log_path
-    Tempfile.create("test-logger.log") do |file|
-      SlowDown.config { |c| c.log_path = file }
+    file = Tempfile.new("test-logger.log")
 
-      assert_equal(file, SlowDown.config.logger.instance_variable_get(:@logdev).dev)
-    end
+    SlowDown.config { |c| c.log_path = file }
+    assert_equal(file, SlowDown.config.logger.instance_variable_get(:@logdev).dev)
+
+    file.close!
   end
 
   def test_silent_logger_by_default
