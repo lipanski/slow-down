@@ -161,9 +161,9 @@ class TestConfigurations < MiniTest::Test
   end
 
   def test_error_logger
-    assert_output(/^(.*),ERROR,(#\d+),default: Timeout error raised$/) do
+    assert_output("", /^(.*),ERROR,(#\d+),default: Timeout error raised$/) do
       SlowDown.config do |c|
-        c.log_path = $stdout
+        c.log_path = $stderr
         c.log_level = Logger::ERROR
         c.raise_on_timeout = true
         c.timeout = 0.5
