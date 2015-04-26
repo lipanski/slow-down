@@ -53,6 +53,7 @@ class TestDefaultGroup < MiniTest::Test
   def test_multiple_throttled_runs_with_timeout
     SlowDown.config do |c|
       c.requests_per_second = 1
+      c.retries = 10
       c.timeout = 0.5
     end
 
@@ -69,6 +70,7 @@ class TestDefaultGroup < MiniTest::Test
   def test_multiple_throttled_runs_with_raised_timeout
     SlowDown.config do |c|
       c.requests_per_second = 1
+      c.retries = 10
       c.timeout = 0.5
       c.raise_on_timeout = true
     end
