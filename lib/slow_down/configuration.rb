@@ -42,7 +42,7 @@ module SlowDown
       @logger ||= Logger.new(log_path).tap do |l|
         l.level = log_level
         l.formatter = proc do |severity, time, group_name, message|
-          "[#{time}] [#{severity}] [##{Process.pid}] [#{group_name}] #{message}\n"
+          "#{time},#{severity},##{Process.pid},#{group_name}: #{message}\n"
         end
       end
     end

@@ -161,7 +161,7 @@ class TestConfigurations < MiniTest::Test
   end
 
   def test_error_logger
-    assert_output(/^\[.*\] \[ERROR\] \[.*\] \[default\] Timeout error raised$/) do
+    assert_output(/^(.*),ERROR,(#\d+),default: Timeout error raised$/) do
       SlowDown.config do |c|
         c.log_path = $stdout
         c.log_level = Logger::ERROR
@@ -177,7 +177,7 @@ class TestConfigurations < MiniTest::Test
   end
 
   def test_info_logger
-    assert_output(/^\[.*\] \[INFO\] \[.*\] \[default\] Lock (.+) was acquired for (\d+)ms$/) do
+    assert_output(/^(.*),INFO,(#\d+),default: Lock (.+) was acquired for (\d+)ms$/) do
       SlowDown.config do |c|
         c.log_path = $stdout
         c.log_level = Logger::INFO
