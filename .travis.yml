@@ -5,7 +5,6 @@ rvm:
   - 2.0.0
   - jruby-head
   - jruby-9.0.0.0.pre1
-  - jruby-1.7.9
 services:
   - redis-server
 env:
