@@ -75,7 +75,7 @@ SlowDown.run(:my_group, requests_per_second: 2, timeout: 1) do
 end
 ```
 
-### Defaults & Available options
+### Defaults & available options
 
 ```ruby
 SlowDown.config do |c|
@@ -100,11 +100,11 @@ SlowDown.config do |c|
   c.retry_strategy = :linear
 
   # Redis can be configured either directly, by setting a Redis instance to this
-  # variable or via the REDIS_URL environment variable or via the redis_url
-  # configuration.
+  # variable, or via the REDIS_URL environment variable or via the redis_url
+  # setting.
   c.redis = nil
 
-  # Configure Redis via the instances' URL.
+  # Configure Redis via the instance URL.
   c.redis_url = nil
 
   # The Redis namespace to apply to all locks.
@@ -169,7 +169,7 @@ If you ever need to reset the locks, you can do that for any group by calling:
 SlowDown.reset(:group_name)
 ```
 
-### Polling Strategies
+### Polling strategies
 
 When a request is placed that can't access the lock right away, **SlowDown** puts it to sleep and schedules it to wake up & try again for the amount of retries configured by the user (defaulting to 30 retries).
 
