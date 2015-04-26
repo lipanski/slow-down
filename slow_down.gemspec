@@ -6,7 +6,7 @@ require "slow_down/version"
 Gem::Specification.new do |spec|
   spec.name          = "slow_down"
   spec.version       = SlowDown::VERSION
-  spec.authors       = ["lipanski"]
+  spec.authors       = ["Florin Lipan"]
   spec.email         = ["lipanski@gmail.com"]
 
   spec.summary       = %q{A centralized Redis-based lock to help you wait on throttled resources}

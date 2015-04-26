@@ -4,11 +4,17 @@
 
 ## Why would you want to slow down your requests?!
 
-Some APIs might be throttling your requests or your own infrastructure is not able to bear the load at peak times. It sometimes pays off to be patient, rather than show a *limit exceeded* error right away.
+Some external APIs might be throttling your requests and web scraping attempts or your own infrastructure is not able to bear the load.
+It sometimes pays off to be patient.
 
-**SlowDown** delays a call up until the point where you can afford triggering it. It relies on a Redis lock so it should be able to handle a cluster of servers all going for the same resource. It's based on the `PX` and `NX` options of the Redis `SET` command, which should make it thread-safe. Note that these options were introduced with Redis version 2.6.12.
+**SlowDown** delays a call up until the point where you can afford triggering it.
+It relies on a Redis lock so it should be able to handle a cluster of servers all going for the same resource.
+It's based on the `PX` and `NX` options of the Redis `SET` command, which should make it thread-safe.
+Note that these options were introduced with Redis version 2.6.12.
 
 ## Usage
+
+### Basic
 
 ```ruby
 require "slow_down"
@@ -21,10 +27,130 @@ SlowDown.config do |c|
   c.redis_url = "redis://localhost:6379/0" # or set the REDIS_URL environment variable
 end
 
-100.times.do
-  SlowDown.run do
-    some_throttled_api_call # accepting only 10 req/sec
+SlowDown.run do
+  some_throttled_api_call # accepting only 10 req/sec
+end
+```
+
+### Default configuration
+
+```ruby
+SlowDown.config do |c|
+  # The allowed number of calls per second.
+  c.requests_per_second = 10
+
+  # The number of seconds during which SlowDown will try and acquire the resource for a given call.
+  c.timeout = 5
+
+  # Whether to raise an error when the timeout was reached and the resource could not be acquired.
+  # Raises SlowDown::Timeout.
+  c.raise_on_timeout = false
+
+  # How many retries should be performed til the timeout is reached.
+  c.retries = 30
+
+  # The algorithm used to schedule the amount of time to wait between retries.
+  # Available strategies: :linear, :inverse_exponential, :fibonacci or a class extending SlowDown::Strategy::Base.
+  c.retry_strategy = :linear
+
+  # Redis can be configured either directly, by setting a Redis instance to this variable
+  # or via the REDIS_URL environment variable or via the redis_url configuration.
+  c.redis = nil
+
+  # Configure Redis via the instances' URL.
+  c.redis_url = nil
+
+  # The Redis namespace to apply to all locks.
+  c.redis_namespace = :slow_down
+
+  # The namespace to apply to the default group.
+  # Individual groups will overwrite this with the group name.
+  c.lock_namespace = :default
+
+  # Set this to a path or file descriptor in order to log to file.
+  c.log_path = STDOUT
+
+  # By default, the SlowDown logger is disabled.
+  # Set this to Logger::DEBUG, Logger::INFO or Logger::ERROR for logging various runtime information.
+  c.log_level = Logger::UNKNOWN
+end
+```
+
+### Groups
+
+**SlowDown** can be configured for individual groups, which can be run in isolation:
+
+```ruby
+SlowDown.config(:github) do |c|
+  c.requests_per_second = 50
+  c.timeout = 10
+end
+
+SlowDown.config(:twitter) do |c|
+  c.requests_per_second = 10
+  c.timeout = 1
+end
+
+# Acquire a lock for the :github group
+SlowDown.run(:github) { ... }
+
+# Acquire a lock for the :twitter group
+SlowDown.run(:twitter) { ... }
+```
+
+### Configuration
+
+When called without a block, `SlowDown.config` will return a `SlowDown::Configuration` object corresponding to the `:default` configuration.
+In order to fetch the configuration of a different group `:my_group`, use `SlowDown.config(:my_group)`.
+
+**SlowDown** may also be configured directly within the `SlowDown.run` call:
+
+```ruby
+# Configure the :default group and run a call
+SlowDown.run(requests_per_second: 5, timeout: 15, raise_on_timeout: true) do
+  # ...
+end
+
+# Configure a different group and run a call within that group
+SlowDown.run(:my_group, requests_per_second: 2, timeout: 1) do
+  # ...
+end
+```
+
+### Non-blocking checks
+
+A call to `.run` will halt until the resource is either acquired or the timeout kicks in.
+In order to make a non-blocking check, you can use the `SlowDown.free?` method.
+
+```ruby
+SlowDown.config do
+  c.requests_per_second = 2
+end
+
+SlowDown.free? # true
+SlowDown.free? # true
+SlowDown.free? # false (and doesn't wait to acquire)
+sleep(1)
+SlowDown.free? # true
+```
+
+The `SlowDown.free?` method also works with groups or with inline configurations:
+
+```ruby
+def register_user(name, address, phone)
+  user.name = name
+
+  # Optional: geocode address, if we didn't exceed the request limit
+  if SlowDown.free?(:geocoding, requests_per_second: 5)
+    user.coordinates = geocode(address)
   end
+
+  # Optional: send SMS, if we didn't exceed the request limit
+  if SlowDown.free?(:sms, requests_per_second: 10)
+    send_sms(phone)
+  end
+
+  user.save
 end
 ```
 
@@ -45,6 +171,12 @@ These polling strategies are just a proof of concept and their behaviour relies 
 - [Redis SET Documentation](http://redis.io/commands/set)
 - [mario-redis-lock](https://github.com/marioizquierdo/mario-redis-lock)
 - [redlock-rb](https://github.com/antirez/redlock-rb)
+
+## Quotes
+
+- *It's like sleep but more classy*
+- *It's like sleep but over-engineered*
+- *SlowHand*
 
 ## Development
 
