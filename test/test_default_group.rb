@@ -5,7 +5,7 @@ class TestDefaultGroup < MiniTest::Test
   include Support::Tolerance
 
   def setup
-    @counter = 0
+    @counter = Queue.new
   end
 
   def teardown
@@ -14,11 +14,11 @@ class TestDefaultGroup < MiniTest::Test
 
   def test_single_straight_run
     elapsed_time = Benchmark.realtime do
-      SlowDown.run { @counter += 1 }
+      SlowDown.run { @counter << 1 }
     end
 
     assert_in_delta(0.0, elapsed_time, TOLERANCE)
-    assert_equal(1, @counter)
+    assert_equal(1, @counter.size)
   end
 
   def test_multiple_straight_runs
@@ -26,12 +26,12 @@ class TestDefaultGroup < MiniTest::Test
 
     elapsed_time = Benchmark.realtime do
       5.times do
-        SlowDown.run { @counter += 1 }
+        SlowDown.run { @counter << 1 }
       end
     end
 
     assert_in_delta(0.0, elapsed_time, TOLERANCE)
-    assert_equal(5, @counter)
+    assert_equal(5, @counter.size)
   end
 
   def test_multiple_throttled_runs
@@ -42,11 +42,11 @@ class TestDefaultGroup < MiniTest::Test
 
     elapsed_time = Benchmark.realtime do
       3.times do
-        SlowDown.run { @counter += 1 }
+        SlowDown.run { @counter << 1 }
       end
     end
 
-    assert_equal(3, @counter)
+    assert_equal(3, @counter.size)
     assert_in_delta(1.0, elapsed_time, TOLERANCE)
   end
 
@@ -56,14 +56,14 @@ class TestDefaultGroup < MiniTest::Test
       c.timeout = 0.5
     end
 
-    SlowDown.run { @counter += 1 }
+    SlowDown.run { @counter << 1 }
 
     elapsed_time = Benchmark.realtime do
-      SlowDown.run { @counter += 1 }
+      SlowDown.run { @counter << 1 }
     end
 
     assert_in_delta(0.5, elapsed_time, TOLERANCE)
-    assert_equal(1, @counter)
+    assert_equal(1, @counter.size)
   end
 
   def test_multiple_throttled_runs_with_raised_timeout
@@ -73,13 +73,13 @@ class TestDefaultGroup < MiniTest::Test
       c.raise_on_timeout = true
     end
 
-    SlowDown.run { @counter += 1 }
+    SlowDown.run { @counter << 1 }
 
     assert_raises(SlowDown::Timeout) do
-      SlowDown.run { @counter += 1 }
+      SlowDown.run { @counter << 1 }
     end
 
-    assert_equal(1, @counter)
+    assert_equal(1, @counter.size)
   end
 
   def test_truthy_free_check
