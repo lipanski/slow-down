@@ -7,7 +7,7 @@
 Some external APIs might be throttling your requests (or web scraping attempts) or your own infrastructure is not able to bear the load.
 It sometimes pays off to be patient...
 
-**SlowDown** delays a call up until the point where you can afford triggering it.
+**SlowDown** delays a call up until the point where you can afford to trigger it.
 It relies on a Redis lock so it should be able to handle a cluster of servers all going for the same resource.
 It's based on the `PX` and `NX` options of the Redis `SET` command, which should make it thread-safe.
 Note that these options were introduced with Redis version 2.6.12.
@@ -136,12 +136,12 @@ end
 
 SlowDown.free? # true
 SlowDown.free? # true
-SlowDown.free? # false (and doesn't wait to acquire)
+SlowDown.free? # false (won't wait)
 sleep(1)
 SlowDown.free? # true
 ```
 
-The `SlowDown.free?` method also works with groups or with inline configurations:
+The `SlowDown.free?` method also works with **groups** and **inline configuration**:
 
 ```ruby
 def register_user(name, address, phone)
@@ -169,7 +169,7 @@ If you ever need to reset the locks, you can do that for any group by calling:
 SlowDown.reset(:group_name)
 ```
 
-## Polling Strategies
+### Polling Strategies
 
 When a request is placed that can't access the lock right away, **SlowDown** puts it to sleep and schedules it to wake up & try again for the amount of retries configured by the user (defaulting to 30 retries).
 
