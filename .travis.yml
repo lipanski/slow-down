@@ -10,6 +10,10 @@ services:
 env:
   global:
     - REDIS_URL="redis://127.0.0.1:6379/0"
-    - JRUBY_OPTS="--dev"
+    - JRUBY_OPTS="$JRUBY_OPTS -Xcext.enabled=false -Xcompile.invokedynamic=false"
+matrix:
+  allow_failures:
+    - rvm: jruby-head
+    - rvm: jruby-9.0.0.0.pre1
 notifications:
   email: false
