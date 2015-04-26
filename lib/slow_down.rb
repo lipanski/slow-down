@@ -40,9 +40,11 @@ module SlowDown
 
   def find_or_create_group(*args)
     if args[0].is_a?(Hash)
-      group_name, options = :default, args[0]
+      group_name = :default
+      options    = args[0]
     else
-      group_name, options = args[0] || :default, args[1] || {}
+      group_name = args[0] || :default
+      options    = args[1] || {}
     end
 
     Group.find_or_create(group_name, options)
