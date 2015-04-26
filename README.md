@@ -130,7 +130,7 @@ A call to `.run` will halt until the resource is either acquired or the timeout 
 In order to make a non-blocking check, you can use the `SlowDown.free?` method.
 
 ```ruby
-SlowDown.config do
+SlowDown.config do |c|
   c.requests_per_second = 2
 end
 
