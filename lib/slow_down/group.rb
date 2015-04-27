@@ -44,14 +44,14 @@ module SlowDown
 
     def run
       expires_at, iteration = Time.now + config.timeout, 0
-      config.logger.debug(name) { "Run attempt initiatied, times out at #{expires_at}" }
+      config.logger.info(name) { "Run attempt initiatied, times out at #{expires_at}" }
 
       begin
         return yield if free?
         wait(iteration += 1)
       end until Time.now > expires_at
 
-      config.logger.debug(name) { "Run attempt timed out" }
+      config.logger.info(name) { "Run attempt timed out" }
       if config.raise_on_timeout
         config.logger.error(name) { "Timeout error raised" }
         raise Timeout
