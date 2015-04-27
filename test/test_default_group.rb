@@ -21,6 +21,20 @@ class TestDefaultGroup < MiniTest::Test
     assert_equal(1, @counter.size)
   end
 
+  def test_straight_run_return_value
+    value = SlowDown.run { :something }
+
+    assert_equal(:something, value)
+  end
+
+  def test_straight_run_return_value_with_raise_on_timeout
+    SlowDown.config { |c| c.raise_on_timeout = true }
+
+    value = SlowDown.run { :something }
+
+    assert_equal(:something, value)
+  end
+
   def test_multiple_straight_runs
     SlowDown.config { |c| c.requests_per_second = 5 }
 
