@@ -60,8 +60,8 @@ module SlowDown
 
     def free?
       config.locks.each do |key|
-        if config.redis.set(key, 1, px: config.miliseconds_per_request_per_lock, nx: true)
-          config.logger.info(name) { "Lock #{key} was acquired for #{config.miliseconds_per_request_per_lock}ms" }
+        if config.redis.set(key, 1, px: config.milliseconds_per_request_per_lock, nx: true)
+          config.logger.info(name) { "Lock #{key} was acquired for #{config.milliseconds_per_request_per_lock}ms" }
           return true
         end
       end
