@@ -61,12 +61,12 @@ module SlowDown
       end
     end
 
-    def miliseconds_per_request
-      @miliseconds_per_request ||= 1000.0 / requests_per_second
+    def milliseconds_per_request
+      @milliseconds_per_request ||= 1000.0 / requests_per_second
     end
 
-    def miliseconds_per_request_per_lock
-      @miliseconds_per_request_per_lock ||= (miliseconds_per_request * concurrency).round
+    def milliseconds_per_request_per_lock
+      @milliseconds_per_request_per_lock ||= (milliseconds_per_request * concurrency).round
     end
 
     def seconds_per_retry(retry_count)
@@ -101,8 +101,8 @@ module SlowDown
       @log_level = nil
       @concurrency = nil
       @locks = nil
-      @miliseconds_per_request = nil
-      @miliseconds_per_request_per_lock = nil
+      @milliseconds_per_request = nil
+      @milliseconds_per_request_per_lock = nil
       @seconds_per_retry = nil
       @seconds_per_retry_arr = nil
     end

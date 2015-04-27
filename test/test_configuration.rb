@@ -191,16 +191,16 @@ class TestConfigurations < MiniTest::Test
     end
   end
 
-  def test_miliseconds_per_request
+  def test_milliseconds_per_request
     SlowDown.config { |c| c.requests_per_second = 42 }
 
-    assert_equal(1000.0 / 42, SlowDown.config.miliseconds_per_request)
+    assert_equal(1000.0 / 42, SlowDown.config.milliseconds_per_request)
   end
 
-  def test_miliseconds_per_request_per_lock
+  def test_milliseconds_per_request_per_lock
     SlowDown.config { |c| c.requests_per_second = 42; c.concurrency = 3 }
 
-    assert_equal(((1000.0 / 42) * 3).round, SlowDown.config.miliseconds_per_request_per_lock)
+    assert_equal(((1000.0 / 42) * 3).round, SlowDown.config.milliseconds_per_request_per_lock)
   end
 
   def test_seconds_per_retry_arr_from_known_symbol
