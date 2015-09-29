@@ -4,7 +4,7 @@ module SlowDown
   module Strategy
     class Linear < Base
       def series
-        n.times.map { 1 }
+        Array.new(n, 1)
       end
     end
   end
