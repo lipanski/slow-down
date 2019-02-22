@@ -1,8 +1,3 @@
-if %w(development test).include?(ENV["RACK_ENV"])
-  require "dotenv"
-  Dotenv.load
-end
-
 require "slow_down/version"
 require "slow_down/group"
 

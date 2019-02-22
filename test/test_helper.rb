@@ -1,4 +1,5 @@
 ENV["RACK_ENV"] = "test"
+require "dotenv"; Dotenv.load
 
 require "minitest/autorun"
 require "minitest/reporters"
