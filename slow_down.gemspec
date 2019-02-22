@@ -7,11 +7,11 @@ Gem::Specification.new do |spec|
   spec.name          = "slow_down"
   spec.version       = SlowDown::VERSION
   spec.authors       = ["Florin Lipan"]
-  spec.email         = ["lipanski@gmail.com"]
+  spec.email         = ["florinlipan@gmail.com"]
 
   spec.summary       = %q{A centralized Redis-based lock to help you wait on throttled resources}
   spec.description   = %q{A centralized Redis-based lock to help you wait on throttled resources}
-  spec.homepage      = "https://github.com/lipanski/slow_down"
+  spec.homepage      = "https://github.com/lipanski/slow-down"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
