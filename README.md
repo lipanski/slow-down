@@ -1,7 +1,7 @@
 # SlowDown
 
 [![Gem Version](https://badge.fury.io/rb/slow_down.svg)](http://badge.fury.io/rb/slow_down)
-[![Build Status](https://travis-ci.org/lipanski/slow-down.svg?branch=master)](https://travis-ci.org/lipanski/slow-down)
+[![Build Status](https://travis-ci.com/lipanski/slow-down.svg?branch=master)](https://travis-ci.com/lipanski/slow-down)
 
 ## Why would you want to slow down your requests?!
 
