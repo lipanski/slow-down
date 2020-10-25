@@ -13,6 +13,16 @@ It relies on a Redis lock so it should be able to handle a cluster of servers al
 It's based on the `PX` and `NX` options of the Redis `SET` command, which should make it thread-safe.
 Note that these options were introduced with Redis version 2.6.12.
 
+## Installation
+
+Add it to your *Gemfile*:
+
+```ruby
+gem "slow_down"
+```
+
+...and call `bundle install`.
+
 ## Usage
 
 ### Basic
@@ -196,9 +206,11 @@ These polling strategies are just a proof of concept and their behaviour relies 
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `bin/console` for an interactive prompt that will allow you to experiment.
+Run tests:
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release` to create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+```
+bundle exec rake
+```
 
 ## Contributing
 

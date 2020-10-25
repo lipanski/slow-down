@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "test_helper"
 require_relative "support/tolerance"
 
@@ -136,7 +138,7 @@ class TestDefaultGroup < MiniTest::Test
   end
 
   def test_free_check_consumes_the_resource
-    SlowDown.config { |c| c.requests_per_second =  3 }
+    SlowDown.config { |c| c.requests_per_second = 3 }
 
     2.times do
       SlowDown.run { 1 }

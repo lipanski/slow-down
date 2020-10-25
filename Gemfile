@@ -1,4 +1,5 @@
-source 'https://rubygems.org'
+# frozen_string_literal: true
 
-# Specify your gem's dependencies in slow_down.gemspec
+source "https://rubygems.org"
+
 gemspec

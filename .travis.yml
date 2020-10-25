@@ -3,14 +3,13 @@ rvm:
   - 2.7
   - 2.6
   - 2.5
-  - 2.3
+  - 2.4
   - jruby-head
 services:
   - redis-server
 branches:
   only:
     - master
-    - develop
 env:
   global:
     - REDIS_URL="redis://127.0.0.1:6379/0"

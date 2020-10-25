@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "test_helper"
 require_relative "support/tolerance"
 
@@ -55,7 +57,8 @@ class TestMultipleGroups < MiniTest::Test
     SlowDown.config(:a) { |c| c.requests_per_second = 1; c.timeout = 0.5 }
     SlowDown.config(:b) { |c| c.requests_per_second = 4; c.timeout = 1.2 }
 
-    a_counter, b_counter = Queue.new, Queue.new
+    a_counter = Queue.new
+    b_counter = Queue.new
 
     2.times do
       @threads << Thread.new do
@@ -87,7 +90,8 @@ class TestMultipleGroups < MiniTest::Test
     SlowDown.config(:a) { |c| c.requests_per_second = 1; c.timeout = 0.5 }
     SlowDown.config(:b) { |c| c.requests_per_second = 4; c.timeout = 1.2; c.raise_on_timeout = true }
 
-    a_counter, b_counter = Queue.new, Queue.new
+    a_counter = Queue.new
+    b_counter = Queue.new
 
     2.times do
       @threads << Thread.new do

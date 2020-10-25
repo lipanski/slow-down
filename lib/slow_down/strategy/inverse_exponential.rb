@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "slow_down/strategy/base"
 
 module SlowDown
@@ -5,7 +7,7 @@ module SlowDown
     class InverseExponential < Base
       def series
         n.times.map do |i|
-          1 - Math::E ** (i + 1)
+          1 - Math::E**(i + 1)
         end
       end
     end

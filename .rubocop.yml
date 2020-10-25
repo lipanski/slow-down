@@ -1,0 +1,168 @@
+# See https://github.com/bbatsov/rubocop/blob/master/manual/cops.md
+AllCops:
+  DisplayCopNames: true
+  Exclude:
+  - ".git/**/*"
+  - "bin/*"
+  - "db/schema.rb"
+  - "node_modules/**/*"
+  - "vendor/**/*"
+Bundler/OrderedGems:
+  Enabled: false
+Layout/ArgumentAlignment:
+  EnforcedStyle: with_fixed_indentation
+Layout/CaseIndentation:
+  EnforcedStyle: end
+Layout/ElseAlignment:
+  Enabled: false
+Layout/EndAlignment:
+  EnforcedStyleAlignWith: variable
+Layout/FirstHashElementIndentation:
+  EnforcedStyle: consistent
+Layout/LineLength:
+  Max: 120
+Lint/AmbiguousOperator:
+  Enabled: false
+Lint/AmbiguousRegexpLiteral:
+  Enabled: false
+Lint/AssignmentInCondition:
+  AllowSafeAssignment: true
+Lint/SuppressedException:
+  Enabled: false
+Lint/UriEscapeUnescape:
+  Enabled: false
+Metrics/AbcSize:
+  Enabled: false
+Metrics/BlockLength:
+  Enabled: false
+Metrics/ClassLength:
+  Enabled: false
+Metrics/CyclomaticComplexity:
+  Enabled: false
+Metrics/MethodLength:
+  Enabled: false
+Metrics/ModuleLength:
+  Enabled: false
+Metrics/ParameterLists:
+  Enabled: false
+Metrics/PerceivedComplexity:
+  Enabled: false
+Naming/AccessorMethodName:
+  Enabled: false
+Naming/VariableNumber:
+  EnforcedStyle: snake_case
+Style/Alias:
+  Enabled: false
+Style/AsciiComments:
+  Enabled: false
+Style/BlockDelimiters:
+  EnforcedStyle: line_count_based # Explicitly, even if this is the default setting
+  Exclude:
+  - "**/spec/**/*.rb"
+  - "**/test/**/*.rb"
+Style/ClassAndModuleChildren:
+  Exclude:
+  - "**/spec/**/*.rb"
+  - "**/test/**/*.rb"
+Style/Documentation:
+  Enabled: false
+Style/DoubleNegation:
+  Enabled: false
+Style/EmptyCaseCondition:
+  Enabled: false
+Style/FormatStringToken:
+  EnforcedStyle: template
+Style/IfUnlessModifier:
+  Enabled: false
+Style/ImplicitRuntimeError:
+  Enabled: true
+Style/MethodCallWithArgsParentheses:
+  Enabled: true
+  Exclude:
+  - "**/config/routes.rb"
+  - "**/config/routes/*.rb"
+  - "**/factories/**/*_factory.rb"
+  - "**/**/Gemfile"
+  - "**/**/Rakefile"
+  - "**/migrate/*"
+  - "*.gemspec"
+  - config.ru
+  IgnoreMacros: true
+  IgnoredMethods:
+  - alias
+  - alias_method
+  - and
+  - And
+  - attr_accessor
+  - attr_reader
+  - attr_writer
+  - attribute
+  - attributes
+  - context
+  - desc
+  - describe
+  - example
+  - fail
+  - feature
+  - Given
+  - halt
+  - include
+  - include_context
+  - include_examples
+  - it
+  - it_behaves_like
+  - it_should_behave_like
+  - not_to
+  - or
+  - puts
+  - raise
+  - redirect_back
+  - redirect_to
+  - render
+  - require
+  - require_relative
+  - shared_examples
+  - shared_context
+  - should
+  - should_not
+  - specify
+  - task
+  - Then
+  - throw
+  - to
+  - to_not
+  - use
+  - visit
+  - When
+  - xit
+Style/MutableConstant:
+  Enabled: false
+Style/NumericLiterals:
+  Enabled: false
+Style/NumericPredicate:
+  Enabled: false
+Style/PercentLiteralDelimiters:
+  PreferredDelimiters:
+    default: "()"
+    "%i": "()"
+    "%I": "()"
+    "%r": "{}"
+    "%w": "()"
+    "%W": "()"
+Style/RedundantException:
+  Enabled: false
+Style/RegexpLiteral:
+  Enabled: false
+Style/RescueModifier:
+  Enabled: false
+Style/Semicolon:
+  AllowAsExpressionSeparator: true
+Style/StringLiterals:
+  Enabled: true
+  EnforcedStyle: double_quotes
+Style/SymbolArray:
+  Enabled: false
+Style/TernaryParentheses:
+  EnforcedStyle: require_parentheses_when_complex
+Style/WordArray:
+  Enabled: false

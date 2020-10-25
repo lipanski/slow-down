@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require "slow_down/configuration"
 
 module SlowDown
   class Group
     def self.all
-      @groups || {}
+      @groups ||= {} # rubocop:disable Naming/MemoizedInstanceVariableName
     end
 
     def self.find(name)
@@ -18,15 +20,14 @@ module SlowDown
     def self.find_or_create(name, options = {})
       if all[name] && !options.empty?
         all[name].config.logger.error(name) { "Group #{name} has already been configured elsewhere" }
-        fail ConfigError, "Group #{name} has already been configured elsewhere - you may not override configurations"
+        raise ConfigError, "Group #{name} has already been configured elsewhere - you may not override configurations"
       end
 
       all[name] || create(name, options)
     end
 
     def self.remove(group_name)
-      return unless group = Group.find(group_name)
-
+      group = Group.find(group_name) || return
       group.reset
       @groups.delete(group_name)
     end
@@ -43,16 +44,19 @@ module SlowDown
     end
 
     def run
-      expires_at, iteration = Time.now + config.timeout, 0
+      expires_at = Time.now + config.timeout
+      iteration = 0
       config.logger.info(name) { "Run attempt initiatied, times out at #{expires_at}" }
 
-      begin
+      loop do
         return yield if free?
+
         wait(iteration += 1)
-      end until Time.now > expires_at
+        break if Time.now > expires_at
+      end
 
       config.logger.info(name) { "Run attempt timed out" }
-      if config.raise_on_timeout
+      if config.raise_on_timeout # rubocop:disable Style/GuardClause
         config.logger.error(name) { "Timeout error raised" }
         raise Timeout
       end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "logger"
 require "redis"
 require "slow_down/strategy/linear"
@@ -19,7 +21,7 @@ module SlowDown
       redis_namespace: :slow_down,
       lock_namespace: :default,
       concurrency: nil,
-      log_path: STDOUT,
+      log_path: $stdout,
       log_level: Logger::UNKNOWN
     }
 
@@ -88,7 +90,7 @@ module SlowDown
           end
 
         unless klass.is_a?(Class) && klass < Strategy::Base
-          fail ConfigError, ":retry_strategy should be a class inheriting SlowDown::Strategy::Base"
+          raise ConfigError, ":retry_strategy should be a class inheriting SlowDown::Strategy::Base"
         end
 
         klass.new(retries, timeout).normalized_series

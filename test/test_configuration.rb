@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "test_helper"
 
 class TestConfigurations < MiniTest::Test
@@ -14,7 +16,7 @@ class TestConfigurations < MiniTest::Test
   end
 
   def test_redis_from_env_variable
-    skip "todo: minitest mocking..."
+    skip("todo: minitest mocking...")
 
     Object.stub_const(:ENV, { "REDIS_URL" => "redis://hello" }) do
       mock = MiniTest::Mock.new
@@ -36,14 +38,6 @@ class TestConfigurations < MiniTest::Test
     end
 
     assert_equal(redis, config.redis)
-  end
-
-  def test_redis_from_url
-    skip "todo: minitest mocking..."
-
-    config = SlowDown.config do |c|
-      c.redis_url = "redis://hello"
-    end
   end
 
   def test_requests_per_second_from_config
@@ -107,7 +101,11 @@ class TestConfigurations < MiniTest::Test
   end
 
   def test_locks
-    SlowDown.config { |c| c.redis_namespace = :hello; c.lock_namespace = :world; c.concurrency = 3 }
+    SlowDown.config do |c|
+      c.redis_namespace = :hello
+      c.lock_namespace = :world
+      c.concurrency = 3
+    end
 
     assert_equal(["hello:world_0", "hello:world_1", "hello:world_2"], SlowDown.config.locks)
   end
@@ -246,6 +244,6 @@ class TestConfigurations < MiniTest::Test
       assert_equal(0.5, SlowDown.config.seconds_per_retry(i + 1))
     end
 
-    assert_equal(nil, SlowDown.config.seconds_per_retry(11))
+    assert_nil(SlowDown.config.seconds_per_retry(11))
   end
 end

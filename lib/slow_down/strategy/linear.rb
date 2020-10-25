@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "slow_down/strategy/base"
 
 module SlowDown

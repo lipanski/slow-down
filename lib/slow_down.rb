@@ -1,4 +1,5 @@
-require "slow_down/version"
+# frozen_string_literal: true
+
 require "slow_down/group"
 
 module SlowDown
@@ -28,9 +29,8 @@ module SlowDown
   end
 
   def reset(group_name = :default)
-    if group = Group.find(group_name)
-      group.reset
-    end
+    group = Group.find(group_name) || return
+    group.reset
   end
 
   def find_or_create_group(*args)

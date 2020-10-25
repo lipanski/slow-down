@@ -1,14 +1,17 @@
+# frozen_string_literal: true
+
 module SlowDown
   module Strategy
     class Base
       attr_reader :n, :max
 
-      def initialize(n, max)
-        @n, @max = n, max
+      def initialize(n, max) # rubocop:disable Naming/MethodParameterName
+        @n = n
+        @max = max
       end
 
       def series
-        fail NotImplemented
+        raise NotImplemented
       end
 
       def normalized_series
