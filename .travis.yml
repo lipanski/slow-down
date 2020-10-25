@@ -4,7 +4,6 @@ rvm:
   - 2.6
   - 2.5
   - 2.4
-  - jruby-head
 services:
   - redis-server
 branches:
@@ -13,9 +12,5 @@ branches:
 env:
   global:
     - REDIS_URL="redis://127.0.0.1:6379/0"
-    - JRUBY_OPTS="$JRUBY_OPTS -Xcext.enabled=false -Xcompile.invokedynamic=false"
-matrix:
-  allow_failures:
-    - rvm: jruby-head
 notifications:
   email: false
